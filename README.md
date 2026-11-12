@@ -7,7 +7,7 @@ Este repositório reproduz a análise de um estudo de fMRI com o software
 imagens brutas até aos mapas de ativação cerebral, e inclui duas variações à análise:
 o efeito do limiar estatístico e a resposta hemodinâmica estimada no giro fusiforme.
 
-**Autores:** [Nome 1], [Nome 2]
+**Autores:** Francisca Morgado, Carolina Reis
 
 ## Requisitos
 
