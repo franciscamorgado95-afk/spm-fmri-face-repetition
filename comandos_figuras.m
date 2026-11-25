@@ -75,3 +75,24 @@ legend({'Nao famoso, 1.a', 'Nao famoso, 2.a', 'Famoso, 1.a', 'Famoso, 2.a'}, ...
 grid on; xlim([0 25]);
 try, theme(gcf, 'light'); end                 % fundo branco (MATLAB R2025a+)
 exportgraphics(gcf, fullfile(out, 'hrf_fusiforme.png'), 'Resolution', 300);
+
+%% 6. Teste F1 > F2 e interacao no pico do giro fusiforme direito
+%  (T e p calculados a partir dos betas, da variancia residual e da matriz
+%   de desenho: T = c'*b / sqrt(s2 * c'*(X'X)^-1*c))
+load(fullfile(p, 'SPM.mat'));
+V   = spm_vol(fullfile(p, SPM.Vbeta(1).fname));
+vox = round(V.mat \ [45 -46 -19 1]');
+nb  = numel(SPM.Vbeta);  b = zeros(nb,1);
+for k = 1:nb
+    b(k) = spm_sample_vol(spm_vol(fullfile(p,SPM.Vbeta(k).fname)), vox(1),vox(2),vox(3),0);
+end
+s2  = spm_sample_vol(spm_vol(fullfile(p,SPM.VResMS.fname)), vox(1),vox(2),vox(3),0);
+can = zeros(1,4);
+for c = 1:4, can(c) = SPM.Sess(1).col(SPM.Sess(1).Fc(c).i(1)); end   % N1 N2 F1 F2
+testes = {'F1 > F2', [0 0 1 -1]; 'Interacao (F1-F2)-(N1-N2)', [-1 1 1 -1]};
+for i = 1:2
+    c = zeros(nb,1); c(can) = testes{i,2};
+    T = (c'*b) / sqrt(s2 * c'*SPM.xX.Bcov*c);
+    fprintf('%-28s T = %.2f   p = %.4f\n', testes{i,1}, T, 1 - spm_Tcdf(T, SPM.xX.erdf));
+end
+% Resultado obtido: F1 > F2  T = 1,51  p = 0,066 ; interacao  T = 1,30  p = 0,098
